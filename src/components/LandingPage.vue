@@ -38,61 +38,79 @@
 </template>
 
 <script>
+// Importa las funciones necesarias desde el archivo firebase.js
 import { googleLogin, emailLogin, registerWithEmail } from '../firebase';
 
 export default {
+  // Definimos el estado del componente con las variables necesarias
   data() {
     return {
-      email: '',
-      password: '',
-      errorMessage: null,
-      isLoginFormVisible: false,
-      isRegisterFormVisible: false
+      email: '',  // Correo electrónico ingresado por el usuario
+      password: '',  // Contraseña ingresada por el usuario
+      errorMessage: null,  // Mensaje de error si algo sale mal
+      isLoginFormVisible: false,  // Bandera para mostrar el formulario de inicio de sesión
+      isRegisterFormVisible: false  // Bandera para mostrar el formulario de registro
     };
   },
   methods: {
+    // Método para realizar el inicio de sesión con correo electrónico
     async login() {
       try {
+        // Llama a la función emailLogin para autenticar al usuario
         await emailLogin(this.email, this.password);
+        // Si el login es exitoso, redirige a la página 'home'
         this.$router.push('/home');
       } catch (error) {
+        // Si ocurre un error, muestra un mensaje y lo registra en la consola
         this.errorMessage = 'Error al iniciar sesión, por favor verifica tus credenciales.';
         console.error('Error de login con email: ', error);
       }
     },
+    // Método para realizar el inicio de sesión con Google
     async loginWithGoogle() {
       try {
+        // Llama a la función googleLogin para autenticar al usuario
         await googleLogin();
+        // Si el login es exitoso, redirige a la página 'notes'
         this.$router.push('/notes');
       } catch (error) {
+        // Si ocurre un error, muestra un mensaje y lo registra en la consola
         this.errorMessage = 'Hubo un problema al iniciar sesión con Google.';
         console.error('Error de login con Google: ', error);
       }
     },
+    // Método para registrar un nuevo usuario con correo electrónico y contraseña
     async register() {
       try {
+        // Llama a la función registerWithEmail para registrar al usuario
         await registerWithEmail(this.email, this.password);
+        // Si el registro es exitoso, redirige a la página 'home'
         this.$router.push('/home');
       } catch (error) {
+        // Si ocurre un error, muestra un mensaje y lo registra en la consola
         this.errorMessage = 'Error al registrar la cuenta, por favor verifica los datos.';
         console.error('Error de registro: ', error);
       }
     },
+    // Método para mostrar el formulario de inicio de sesión
     showLoginForm() {
-      this.isLoginFormVisible = true;
-      this.isRegisterFormVisible = false;
+      this.isLoginFormVisible = true;  // Muestra el formulario de inicio de sesión
+      this.isRegisterFormVisible = false;  // Oculta el formulario de registro
     },
+    // Método para mostrar el formulario de registro
     showRegisterForm() {
-      this.isRegisterFormVisible = true;
-      this.isLoginFormVisible = false;
+      this.isRegisterFormVisible = true;  // Muestra el formulario de registro
+      this.isLoginFormVisible = false;  // Oculta el formulario de inicio de sesión
     },
+    // Método para cerrar ambos formularios
     closeForm() {
-      this.isLoginFormVisible = false;
-      this.isRegisterFormVisible = false;
+      this.isLoginFormVisible = false;  // Oculta el formulario de inicio de sesión
+      this.isRegisterFormVisible = false;  // Oculta el formulario de registro
     }
   }
 };
 </script>
+
 
 <style scoped>
 * {

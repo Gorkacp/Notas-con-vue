@@ -57,79 +57,125 @@
 
 <script>
 export default {
+  // Define el nombre del componente
   name: 'NotesPage',
+
+  // Define el estado inicial del componente
   data() {
     return {
-      newNoteText: '', // Texto de la nueva nota
-      notes: [], // Lista de notas
-      currentUser: null, // Usuario actual
-      animationIndex: null, // Para controlar la animación
+      newNoteText: '', // Texto de la nueva nota que el usuario quiere agregar
+      notes: [], // Lista de todas las notas
+      currentUser: null, // Información sobre el usuario actual (aún no se usa)
+      animationIndex: null, // Para controlar el índice de la nota que tiene animación
     };
   },
+
+  // Propiedades computadas que se actualizan automáticamente cuando cambian los datos
   computed: {
+    // Cuenta las notas que no están completadas
     pendingTasksCount() {
       return this.notes.filter(note => !note.completed).length;
     },
+    // Cuenta el total de notas
     totalTasksCount() {
       return this.notes.length;
     },
+    // Ordena las notas según la prioridad (de mayor a menor)
     sortedNotes() {
       return [...this.notes].sort((a, b) => {
+        // Define un objeto que asigna un valor numérico a cada prioridad
         const priorityOrder = { High: 3, Normal: 2, Low: 1 };
+        // Ordena las notas según la prioridad, de más alta a más baja
         return priorityOrder[b.priority] - priorityOrder[a.priority];
       });
     },
   },
+
+  // Hook que se ejecuta cuando el componente es creado
   created() {
     try {
+      // Intenta cargar las notas desde el almacenamiento local (LocalStorage)
       const savedNotes = JSON.parse(localStorage.getItem('notes')) || [];
-      this.notes = savedNotes;
+      this.notes = savedNotes; // Asigna las notas cargadas al estado del componente
     } catch (error) {
+      // Si hay un error al cargar las notas, muestra un mensaje en la consola
       console.error('Error al cargar las notas desde LocalStorage:', error);
-      this.notes = [];
+      this.notes = []; // Si ocurre un error, inicializa las notas como un array vacío
     }
   },
+
+  // Métodos que gestionan las interacciones con las notas
   methods: {
+    // Método para agregar una nueva nota
     addNote() {
+      // Si el texto de la nueva nota está vacío, no se hace nada
       if (this.newNoteText.trim() === '') return;
 
+      // Crea una nueva nota con un ID único basado en la hora actual
       const newNote = {
         id: Date.now(),
         text: this.newNoteText,
-        priority: 'Normal',
-        completed: false,
-        createdAt: new Date().toLocaleString(),
+        priority: 'Normal', // Establece la prioridad predeterminada en "Normal"
+        completed: false, // Establece que la nota no está completada
+        createdAt: new Date().toLocaleString(), // La fecha y hora de creación de la nota
       };
 
+      // Agrega la nueva nota a la lista de notas
       this.notes.push(newNote);
+      // Guarda las notas en el almacenamiento local
       this.saveNotes();
+      // Limpia el campo de texto de la nueva nota
       this.newNoteText = '';
+      // Establece el índice de la nota para aplicar animaciones
       this.animationIndex = this.notes.length - 1;
     },
+
+    // Método para cambiar la prioridad de una nota
     changePriority(note, priority) {
+      // Actualiza la prioridad de la nota
       note.priority = priority;
+      // Guarda las notas actualizadas en el almacenamiento local
       this.saveNotes();
     },
+
+    // Método para cambiar el estado de completado de una nota (marcar como completada o no)
     toggleStatus(note) {
+      // Invierte el estado de completado
       note.completed = !note.completed;
+      // Guarda las notas actualizadas en el almacenamiento local
       this.saveNotes();
     },
+
+    // Método para eliminar una nota por su ID
     deleteNote(id) {
+      // Filtra las notas para eliminar la que tiene el ID proporcionado
       this.notes = this.notes.filter(note => note.id !== id);
+      // Guarda las notas actualizadas en el almacenamiento local
       this.saveNotes();
     },
+
+    // Método para limpiar todas las notas completadas
     clearCompleted() {
+      // Filtra las notas para eliminar las que están marcadas como completadas
       this.notes = this.notes.filter(note => !note.completed);
+      // Guarda las notas actualizadas en el almacenamiento local
       this.saveNotes();
     },
+
+    // Método para guardar las notas en el almacenamiento local
     saveNotes() {
       try {
+        // Convierte las notas en una cadena JSON y las guarda en LocalStorage
         localStorage.setItem('notes', JSON.stringify(this.notes));
       } catch (error) {
+        // Si ocurre un error al guardar, muestra un mensaje en la consola
         console.error('Error al guardar las notas en LocalStorage:', error);
       }
     },
+
+    // Método para remover la animación de una nota cuando ya no es necesario
     removeAnimation(index) {
+      // Si el índice de la animación coincide con el índice proporcionado, lo elimina
       if (index === this.animationIndex) {
         this.animationIndex = null;
       }
@@ -137,6 +183,7 @@ export default {
   },
 };
 </script>
+
 
 <style scoped>
 .notes-page {
